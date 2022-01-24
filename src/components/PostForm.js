@@ -1,6 +1,7 @@
 import React, { Component } from "react";
-import {connect} from 'react-redux'
-import {createPost} from '../redux/actions'
+import { connect } from "react-redux";
+import { createPost, showAlert } from "../redux/actions";
+import Alert from "./Alert";
 
 class PostForm extends Component {
 	constructor(props) {
@@ -13,17 +14,18 @@ class PostForm extends Component {
 	submitHandler = (e) => {
 		e.preventDefault();
 
-        const {title} = this.state
+		const { title } = this.state;
 
-		if(!title.trim()){
-			return
+		if (!title.trim()) {
+			return this.props.showAlert("Name is empty");
 		}
 
-        const newPost = {
-            title, id: Date.now().toString()
-        }
-        this.props.createPost(newPost)
-        this.setState({title : ''})
+		const newPost = {
+			title,
+			id: Date.now().toString(),
+		};
+		this.props.createPost(newPost);
+		this.setState({ title: "" });
 	};
 	changeInputHandler = (e) => {
 		this.setState((prev) => ({
@@ -36,6 +38,9 @@ class PostForm extends Component {
 		return (
 			<div>
 				<form onSubmit={this.submitHandler}>
+					
+				{this.props.alert && <Alert text={this.props.alert} />}
+
 					<div className='form-group'>
 						<label htmlFor='title' className='form-label'>
 							Заголовок поста
@@ -59,8 +64,13 @@ class PostForm extends Component {
 	}
 }
 
-const mapDispatchToProps = {
-    createPost
-}
+const mapStateToProps = state => ({
+	alert: state.app.alert
+})
 
-export default connect(null, mapDispatchToProps)(PostForm);
+const mapDispatchToProps = {
+	createPost,
+	showAlert,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(PostForm);
